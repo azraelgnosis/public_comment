@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <form>
+                    <label style="font-weight: bold;">Speaker Name</label>
+                    <input type="text" placeholder="Speaker name"/><br>
+
+                    <label style="font-weight: bold;">Speaker Residency</label>
+                    <br />
+                    <label>Neighborhood</label>
+                    <input type="text" placeholder="Neighborhood" /><br />
+
+                    <label>Council District</label>
+                    <select>
+                        {% for councillor in council_districts %}
+                            <option>District {{ loop.index }} - {{ councillor }}</option>
+                        {% endfor %}
+                    </select>
+                    <br />
+
+                    <input type="checkbox" id="atlanta_resident"/>
+                    <label for="atlanta_resident">City of Atlanta</label>
+                    <br />
+            
+                    <h2 style="font-weight: bold;">Sentiments</h2>
+                    {% for group, sentiments in sentiments_dict.items() %}
+                        <h4 style="font-weight: bold;">{{ group }}</h4>
+                            {% for sentiment in sentiments %}
+                                <input type="checkbox" id="{{ sentiment }}" />
+                                <label>{{ sentiment }}</label>
+                            {% endfor %}
+                    {% endfor %}
+            
+                    <br>
+                    <br />
+                    <label for="overall">Overall:</label>
+                    <input id="overall" type="text"/>
+                    <br>
+                    <label for="notes">Notes:</label>
+                    <input id="notes" type="text" />
+                    
+                </form>
+            </div>
+
+            <div class="col">
+                <audio controls></audio><br>
+                <div id="transcript" contentEditable=True>30310 and I was just calling to leave a comment and request that we defund the Atlanta police department and reallocate the resources from it. I believe that the APD in Santa Cruz public safety and wellness and instacart curb violence through increased training to been as ineffective. I want, I feel we should dismantle and replace a department that isn't proven ineffective at carrying out its mandate and is unresponsive to reform, a plan that should be created for defunding APD and reallocating resources to more effective community based strategies for reducing crime and increasing safety. I also think that we should defend and demolish the jail and as well as getting justice for the people that APD needs to be accountable for. officers must be held accountable for killing people and failing to address the police killings in the past to that cumulated his trust in the city of Atlanta the value of black life. You know, there are several ways where we could reallocate the resources in different the Atlanta police department. But I believe we should create a five to seven year plan firstly to dismantle the Atlanta police department and build a new community based community controlled public safety system. You know, and that was the comment. I was hoping to each Thank you.</div>
+                <button class="btn btn-info">Edit Transcript</button>
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col">
+                <input class="btn btn-primary" type="submit" />
+            </div>
+        </div>
+    </div>    
+{% endblock content %}
+
+{% block scripts %}
+    <script>let keywords = {{ keywords|safe }};</script>
+    <script src="{{ url_for('static', filename='scripts/transcript.js') }}"></script>
+{% endblock scripts %}

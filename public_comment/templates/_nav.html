@@ -1,0 +1,17 @@
+<nav class="navbar navbar-expand-sm navbar-light">
+    <a class="navbar-brand" href=""><img src="{{ url_for('static', filename='images/code for atlanta logo.png') }}"></a>
+    <div class="container-fluid">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="" >Public Comment</a></li>
+        </ul>
+        <ul class="navbar-nav">
+            {% if g.user %}
+                <li class="nav-item"><span>{{ g.user['username'] }}</span></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
