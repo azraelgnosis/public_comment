@@ -5,7 +5,7 @@ bp = Blueprint('um', __name__)
 
 @bp.route('/')
 def index():
-    return "index"
+    return render_template('index.html')
 
 @bp.route('/um/')
 def um():

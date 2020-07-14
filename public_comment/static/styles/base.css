@@ -37,3 +37,7 @@ textarea#transcript {
 mark {
     background-color: yellow;
 }
+
+.flash {
+    color: red;
+}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method='POST'>
+        <input type="text" name="name" placeholder="Name..." required/><br />
+        <input type="text" name="username" placeholder="Username..." required/><br />
+        <input type="text" name="password" placeholder="Password..." required/><br />
+        <input type="text" placeholder="Confirm Password" required/><br />
+        <input type="submit" value="Register"/>
+    </form>
+{% endblock content %}
