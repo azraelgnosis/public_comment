@@ -111,6 +111,8 @@ class DataManager:
         except ValueError:
             if isinstance(conditions, str):
                 WHERE += f"{val} = '{conditions}'"
+        except TypeError:
+            pass
 
         return WHERE
 
@@ -141,19 +143,25 @@ class DataManager:
 
     #TODO: columns parameter 
     #? and maybe intersection of table columns and values
-    def insert(self, table:str, values:dict) -> None:
+    def insert(self, table:str, values:dict, datatype=None) -> None:
         """
         INSERT INTO `table` VALUES (`values`)
         """
+        
+        if datatype:
+            new_obj = datatype.from_dict(values)
+            values = new_obj.to_dict()
 
-        INSERT = f"INSERT INTO `{table}`"
         cols = self.get_columns(table)[1:]
-        COLUMNS = "({})".format(", ".join(cols))
-        VALUES = "VALUES ({})".format(", ".join("?" * len(cols)))
+        INSERT = "INSERT INTO `{TABLE}` ({COLUMNS}) VALUES ({VALUES})".format(
+            TABLE=table,
+            COLUMNS=", ".join(cols),
+            VALUES=", ".join("?" * len(cols))
+        )
 
         db = self.get_db()
         db.execute(
-            " ".join([INSERT, COLUMNS, VALUES]),
+            INSERT,
             [f"{values.get(key)}" for key in cols]
         )
         db.commit()
@@ -187,75 +195,3 @@ class DataManager:
 
         DataManager().init_db()
         click.echo(f"Initialized the database.")
-
-class Model:
-    __slots__ = ['id', 'val']
-    fks = {}
-
-    def __init__(self):
-        self.id = None
-        self.val = None
-
-    def init(self, **kwargs):
-        for key, val in kwargs.items():
-            setattr(self, key, val)
-
-    @staticmethod
-    def _coerce_type(val, separator=","):
-        """
-        Coerces `val` as a float or int if applicable,
-        else returns original value.
-
-        :param val: Value to coerce.
-        """
-
-        if isinstance(val, str):
-            if len(coll := val.split(separator)) > 1:
-                val = [Model._coerce_type(elem.strip()) for elem in coll]
-
-            try:
-                if "." in str(val):
-                    val = float(val)
-                else:
-                    val = int(val)
-            except TypeError: pass
-            except ValueError: pass
-
-        return val
-
-    @classmethod
-    def from_row(cls, row):
-        new_obj = cls()
-
-        for col in row.columns:
-            setattr(new_obj, col, row.get(col))
-
-        return new_obj
-
-    def to_list(self) -> list:
-        return [getattr(self, val) for val in self.__slots__]
-
-    @classmethod
-    def from_dict(cls, dct):
-        new_obj = cls()
-
-        for slot in cls.__slots__:
-            val = cls._coerce_type(dct.get(slot))
-            setattr(new_obj, slot, val)
-
-        new_obj.init()
-
-        return new_obj
-
-    def to_dict(self):
-        return {key: getattr(self, key) for key in self.__slots__}
-
-    def __repr__(self):
-        name = type(self).__name__.lower()
-        return "{name}: {id} {val}".format(name=name, id=self[name+"_id"], val=self[name+"_val"])
-
-    def __getitem__(self, key):
-        try:
-            return getattr(self, key)
-        except TypeError:
-            raise KeyError

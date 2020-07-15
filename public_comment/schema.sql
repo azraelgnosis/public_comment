@@ -6,5 +6,3 @@ CREATE TABLE users (
     name TEXT NOT NULL,
     password TEXT NOT NULL
 );
-
-INSERT INTO users (val, name, password) VALUES ('root', 'root', 'toor');

@@ -1,4 +1,5 @@
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, g, redirect, render_template, request, session, url_for
+import functools
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from public_comment.const import *
@@ -24,6 +25,7 @@ def register():
 
         if not error:
             dm.insert(USERS, values=new_user.to_dict())
+            return redirect(url_for('auth.login'))
 
         flash(error)
 
@@ -52,5 +54,24 @@ def login():
 
     return render_template("auth/login.html")
 
+@bp.route('/logout')
 def logout():
-    pass
+    session.clear()
+    return redirect(url_for('um.index'))
+
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get(USER_ID)
+
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = dm.select('users', where=user_id)[0]
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+        return view(**kwargs)
+    return wrapped_view
