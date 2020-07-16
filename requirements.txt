@@ -1,4 +1,3 @@
-python
 gunicorn
 Flask
 Jinja2
