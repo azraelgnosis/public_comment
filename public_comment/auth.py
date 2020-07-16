@@ -48,7 +48,7 @@ def login():
         if not error:
             session.clear()
             session[USER_ID] = user[ID]
-            return redirect(url_for('um.index'))
+            return redirect(url_for('vox.index'))
         
         flash(error)
 
@@ -57,7 +57,7 @@ def login():
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('um.index'))
+    return redirect(url_for('vox.index'))
 
 @bp.before_app_request
 def load_logged_in_user():

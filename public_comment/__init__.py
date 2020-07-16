@@ -20,7 +20,7 @@ def create_app():
     import public_comment.auth
     app.register_blueprint(auth.bp)
 
-    import public_comment.um
-    app.register_blueprint(um.bp)
+    import public_comment.vox
+    app.register_blueprint(vox.bp)
 
     return app
