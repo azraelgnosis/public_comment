@@ -1,0 +1,8 @@
+python
+gunicorn
+Flask
+Jinja2
+Werkzeug
+openpyxl
+pandas
+numpy
