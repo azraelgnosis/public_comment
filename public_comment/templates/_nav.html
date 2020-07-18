@@ -1,8 +1,10 @@
 <nav class="navbar navbar-expand-sm navbar-light">
-    <a class="navbar-brand" href=""><img src="{{ url_for('static', filename='images/code for atlanta logo.png') }}"></a>
+    <a class="navbar-brand" href="https://www.codeforatlanta.org/"><img src="{{ url_for('static', filename='images/code for atlanta logo.png') }}"></a>
     <div class="container-fluid">
         <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" href="" >Public Comment</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('vox.index') }}" >Public Comment</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('vox.table') }}" >Table</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('vox.form') }}" >Form</a></li>
         </ul>
         <ul class="navbar-nav">
             {% if g.user %}

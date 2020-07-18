@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="spreadsheet" accept=".csv,.xlsx"/>
+        <input type="number" name="header" value="0" min="0"/>
+        <input class="btn btn-primary" type="submit" value="Upload" />
+    </form>
+
+    {% if row is defined %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <form action="">
+                    <label style="font-weight: bold;">Speaker Name</label>
+                    <input type="text" placeholder="Speaker name" value="{{ row['caller'] }}"/><br>
+
+                    <label>Council District</label>
+                    <select>
+                        {% for councillor in council_districts %}
+                            <option>District {{ loop.index }} - {{ councillor }}</option>
+                        {% endfor %}
+                    </select>
+                    <br />
+
+                    <input type="checkbox" id="atlanta_resident"/>
+                    <label for="atlanta_resident">City of Atlanta</label>
+                    <br />
+
+                    <label for="overall">Overall:</label>
+                    <input id="overall" type="text"/>
+                    <br>
+                    <label for="notes">Notes:</label>
+                    <input id="notes" type="text" />
+                </form>
+            </div>
+            <div class="col">
+                <audio controls></audio><br>
+                <div id="transcript" contentEditable=True>{{ row['edited text'] or row['full text'] }}</div> 
+                <button class="btn btn-info">Edit Transcript</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input class="btn btn-primary" type="submit" />
+            </div>
+        </div>
+    </div>
+        
+    {% endif %}
+    
+{% endblock content %}
+
+{% block scripts %}
+    <script>let keywords = {{ keywords|safe }};</script>
+    <script src="{{ url_for('static', filename='scripts/transcript.js') }}"></script>
+{% endblock scripts %}

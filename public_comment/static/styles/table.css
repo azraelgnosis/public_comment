@@ -1,0 +1,9 @@
+tr, td {
+    max-height: 30px;
+    height: 20px;
+    line-height: 10px;;
+}
+
+iframe {
+    height: 80%;
+}

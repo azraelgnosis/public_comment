@@ -189,31 +189,6 @@ class Analyzer:
                     check = True if note == 'y' else False
 
         raise NotImplementedError
-            
-            
-
-    @staticmethod
-    def _filter_df(df, filters:dict, exclude=False, func='isin') -> pd.DataFrame:
-        """
-        """
-
-        funcs = {
-            'isin': pd.Series.isin,
-            'isna': pd.Series.isna,
-            'notna': pd.Series.notna
-        }
-
-        vert = op.inv if exclude or ('not ' in func) else op.pos
-        func = funcs.get(func, func)
-
-        for col in filters:
-            try:
-                val = filters.get(col)
-                df = df[vert(func(df[col], val))]
-            except AttributeError:
-                df = df[vert(func(df[col]))]
-        
-        return df
 
     @staticmethod
     def _update_df(anchor_df:pd.DataFrame, target_df:pd.DataFrame, index:str=None) -> pd.DataFrame:
