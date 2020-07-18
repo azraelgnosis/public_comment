@@ -121,17 +121,12 @@ class DataManager:
         SELECT `columns` FROM `table`
         """
 
-        # SELECT = "SELECT {columns}".format(columns=self._columns(columns))
-        # FROM = f"FROM {table}"
-        # JOIN = self._join(table, join)
-        # WHERE = f"WHERE {self._where(where)}" if where else ""
-
-        SELECT = "SELECT {COLUMNS} FROM {TABLE} {JOIN} WHERE TRUE AND {WHERE}" \
+        SELECT = "SELECT {COLUMNS} FROM {TABLE} {JOIN} {WHERE}" \
             .format(
                 COLUMNS=self._columns(columns),
                 TABLE=table,
                 JOIN=self._join(table, join),
-                WHERE=self._where(where)
+                WHERE=f"WHERE {self._where(where)}" if where else ""
             )
 
         # results = self.get_db().execute(" ".join([SELECT, FROM, JOIN, WHERE])).fetchall()

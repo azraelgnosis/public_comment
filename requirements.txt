@@ -1,7 +1,10 @@
-gunicorn
-Flask
-Jinja2
-Werkzeug
-openpyxl
-pandas
-numpy
+gunicorn==20.0.4
+Flask==1.1.2
+Jinja2==2.11.2
+Werkzeug==1.0.1
+openpyxl==3.0.4
+pandas==1.0.5
+numpy==1.19.0
+MarkupSafe==1.1.1
+click==7.1.2
+xlrd==1.2.0
