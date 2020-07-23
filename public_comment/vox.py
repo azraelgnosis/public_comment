@@ -32,7 +32,12 @@ def form(index:int=None):
             table = vp.set_table(spreadsheet, header)
             
     row = vp.get_row(table, index)
-    council_districts = ['Carla Smith', 'Amir R. Farokhi', 'Antonio Brown', 'Cleta Winslow']
-    keywords = ['defund', 'reform', 'reallocate', 'training', 'dismantle', 'replace', 'jail', 'prison', 'community']
+    council_districts = ['Carla Smith', 'Amir R. Farokhi', 'Antonio Brown', 'Cleta Winslow', 'Natalyn Archibong', 'Jennifer N. Ide', 'Howard Shook', 'J. P. Matzigkeit', 'Dustin Hillis', 'Andrea L. Boone', 'Marci Collier Overstreet', 'Joyce Sheperd', 'Michael Julian Bond', 'Matt Westmoreland', 'Andre Dickens']0
+    # TODO easier to way update keywords
+    keywords = ['afford', 'arrest', 'civil', 'community', 'criminal', 'defund', 'dismantle', 'homeless', 'jail', 'officer', 'police', 'policing', 'prison', 'private', 'property', 'public' 'reallocate', 'reform', 'replace', 'school', 'training', 'victim']
+    cities = []
+    counties = []
+    neighborhoods = []
+    intents = ["For Police (Support Budget)", "Defund Police (Amend Budget)", "Other"] 
 
-    return render_template('form.html', row=row)
+    return render_template('form.html', row=row, intents=intents)

@@ -15,6 +15,8 @@
                     <label style="font-weight: bold;">Speaker Name</label>
                     <input type="text" placeholder="Speaker name" value="{{ row['caller'] }}"/><br>
 
+                    <h2>Location</h2>
+
                     <label>Council District</label>
                     <select>
                         {% for councillor in council_districts %}
@@ -23,8 +25,88 @@
                     </select>
                     <br />
 
+                    <label for="street">Street</label>
+                    <input type="text" id="street" name="street" />
+                    
+                    <br />
+                    
+                    <label for="city">City</label>
+                    <select>
+                        {% for city in cities %}
+                        <option>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="cities" name="cities" />
+                    
+                    <datalist id="cities">
+                        {% for city in cities %}
+                        <option value="{{ city }}"></option>
+                        {% endfor %}
+                    </datalist>
+                    
+                    <br />
+
+                    <label for="neighborhood">Neighborhood</label>
+                    <select name="neighborhood" id="neighborhood">
+                        {% for neighborhood in neighborhoods %}
+                            <option>{{ neighborhood }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="neighborhood" id="neighborhood" />
+
+                    <datalist id="neighborhoods">
+                        {% for neighborhood in neighborhoods %}
+                            <option value="{{ neighborhood }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <br />
+
+                    <label for="zone">Zone</label>
+                    <select>
+                        {% for zone in zones %}
+                            <option>{{ zone }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="zone" name="zone" />
+
+                    <datalist id="zone">
+                        {% for zone in zones %}
+                            <option value="{{ zone }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <br />
+
+                    <label for="npu">NPU (Neighborhood Planning Unit)</label>
+                    <input type="text" id="npu" name="npu" />
+
+                    <br />
+
+                    <label for="zip">Zip Code</label>
+                    <input type="number" id="zip" name="zip" min="00501" max="99950" />
+
+                    <br />
+
                     <input type="checkbox" id="atlanta_resident"/>
                     <label for="atlanta_resident">City of Atlanta</label>
+                    <br />
+
+                    <label for="other_location">Other</label>
+                    <input type="text" id="other_location" name="other_location" />
+
+                    <label for="topic">Topic</label>
+                    <input type="text" id="topic" name="topic" />
+
+                    <br />
+
+                    <label for="intent">Intent</label>
+                    <select>
+                        {% for intent in intents %}
+                            <option value="{{ intent }}">{{ intent }}</option>
+                        {% endfor %}
+                    </select>
+
                     <br />
 
                     <label for="overall">Overall:</label>
