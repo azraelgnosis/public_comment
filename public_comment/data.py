@@ -11,19 +11,23 @@ print()
 
 class VoxPopuli:
     def __init__(self):
-        self.table = None
+        self._table = None
 
-    def get_table(self) -> pd.DataFrame:
-        return g.get('table')
+    @property
+    def table(self):
+        return self._table
 
-    def set_table(self, table, header=0) -> pd.DataFrame:
-        # self.table = table
-        g.table = self.read_xlsx(table, header)
-        return g.table
+    @table.setter
+    def table(self, obj):
+        if isinstance(obj, dict):
+            sheet = obj.get('sheet')
+            header = obj.get('header', 0)
+
+        self._table = self.read_xlsx(sheet, header)
 
     def get_row(self, table:pd.DataFrame=None, index:int=None) -> pd.Series:
         row = None
-        df = table if table is not None else self.get_table()
+        df = self.table
         if df is not None:
             if index:
                 row = df.iloc[index]

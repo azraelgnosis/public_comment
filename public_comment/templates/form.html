@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('vox.load_table') }}" enctype="multipart/form-data">
         <input type="file" name="spreadsheet" accept=".csv,.xlsx"/>
         <input type="number" name="header" value="0" min="0"/>
         <input class="btn btn-primary" type="submit" value="Upload" />

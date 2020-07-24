@@ -95,3 +95,9 @@ class Comment(Model):
         self.location = None
         self.sentiment = None
         self.text = None
+
+class Location(Model):
+    __slots__ = []
+
+class Sentiment(Model):
+    __slots__ = []
