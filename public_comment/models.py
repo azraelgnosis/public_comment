@@ -84,3 +84,14 @@ class Model:
 class User(Model):
     __slots__ = ['name', 'val', 'username', 'password']
     synonyms = {'val': 'username'}
+
+class Comment(Model):
+    __slots__ = ['track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
+
+    def __init__(self):
+        self.track = None
+        self.entered_by = None
+        self.caller = None
+        self.location = None
+        self.sentiment = None
+        self.text = None
