@@ -1,14 +1,18 @@
+import pandas as pd
+
 class Model:
     __slots__ = ['id', 'val']
     synonyms = {}
 
     def __init__(self):
-        self.id = None
-        self.val = None
+        for slot in self.__slots__:
+            setattr(self, slot, None)
 
     def init(self, **kwargs):
         for key, val in kwargs.items():
-            setattr(self, key, val)
+            if key in self.__slots__:
+                val = self._coerce_type(val)
+                setattr(self, key, val)
 
         self._fill_columns()
     
@@ -46,10 +50,12 @@ class Model:
     def from_row(cls, row):
         new_obj = cls()
 
-        for col in row.columns:
-            setattr(new_obj, col, row.get(col))
+        for slot in cls.__slots__:
+            val = cls._coerce_type(getattr(row, slot, None))
+            if val:
+                setattr(new_obj, slot, val)
 
-        new_obj.init()
+        new_obj.init(**row.to_dict())
 
         return new_obj
 
@@ -62,7 +68,8 @@ class Model:
 
         for slot in cls.__slots__:
             val = cls._coerce_type(dct.get(slot))
-            setattr(new_obj, slot, val)
+            if val:
+                setattr(new_obj, slot, val)
 
         new_obj.init()
 
@@ -72,8 +79,8 @@ class Model:
         return {key: getattr(self, key) for key in self.__slots__}
 
     def __repr__(self):
-        name = type(self).__name__.lower()
-        return "{name}: {id} {val}".format(name=name, id=self[name+"_id"], val=self[name+"_val"])
+        name = type(self).__name__
+        return "{name}: {id} {val}".format(name=name, id=self[name.lower()+"_id"], val=self[name.lower()+"_val"])
 
     def __getitem__(self, key):
         try:
@@ -82,22 +89,55 @@ class Model:
             raise KeyError
 
 class User(Model):
-    __slots__ = ['name', 'val', 'username', 'password']
-    synonyms = {'val': 'username'}
+    __slots__ = ['user_id', 'user_val', 'name', 'username', 'password']
+    synonyms = {'user_val': 'username'}
 
 class Comment(Model):
-    __slots__ = ['track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
+    __slots__ = ['dir', 'track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
 
     def __init__(self):
-        self.track = None
+        super().__init__()
+        self.dir = ''
+        self.track = 0
         self.entered_by = None
         self.caller = None
         self.location = None
         self.sentiment = None
         self.text = None
 
+    @classmethod
+    def from_dict(cls, dct):
+        new_comment = super().from_dict(dct)
+        new_comment.location = Location.from_dict(dct)
+        new_comment.sentiment = Sentiment.from_dict(dct)
+
+        new_comment.text = dct.get('edited text')
+        if pd.isna(new_comment.text):
+            new_comment.text = dct.get('full text')
+
+        return new_comment
+
 class Location(Model):
-    __slots__ = []
+    __slots__ = ['district', 'neighborhood', 'street', 'city', 'ZIP', 'zone', 'NPU', 'Atlanta', 'other']
+
+class NPU(Model):
+    __slots__ = ['npu_id', 'npu_val', 'name', 'neighborhoods']
+    synonyms = {'npu_val': 'name'}
+
+class Zone(Model):
+    __slots__ = ['zone_id', 'zone_val']
+
+class Neighborhood(Model):
+    __slots__ = ['neighborhood_id', 'neighborhood_val', 'name', 'npu', 'zone']
+    synonyms = {'neighborhood_val': 'name'}
+
+    def init(self, **kwargs):
+        super().init(**kwargs)
+        self.npu = NPU.from_dict(kwargs)
+        self.zone = Zone.from_dict(kwargs)
+
+class District(Model):
+    __slots__ = ['district_id', 'district_val', 'councilor']
 
 class Sentiment(Model):
     __slots__ = []

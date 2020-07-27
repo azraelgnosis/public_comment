@@ -2,13 +2,6 @@ from flask import g
 import operator as op
 import pandas as pd
 
-# SHEET_PATH = "F:\drive\skami\sampla\python\public_comment\Full Council 2020-07-06.xlsx"
-
-# data = pd.read_excel(SHEET_PATH, header=2)
-# row = data.sample(1)
-
-print()
-
 class VoxPopuli:
     def __init__(self):
         self._table = None
@@ -25,19 +18,22 @@ class VoxPopuli:
 
         self._table = self.read_xlsx(sheet, header)
 
-    def get_row(self, table:pd.DataFrame=None, index:int=None) -> pd.Series:
-        row = None
-        df = self.table
+    def get_series(self, table:pd.DataFrame=None, index:int=None) -> pd.Series:
+        series = pd.Series()
+        df = table
+
+        if isinstance(table, pd.DataFrame) and table.empty:
+            df = self.table
         if df is not None:
             if index:
-                row = df.iloc[index]
+                series = df.iloc[index]
             else:
                 unaccounted_df = self._filter_df(df, filters=['entered by'], func='isna')
                 if unaccounted_df.empty:
                     unaccounted_df = df
-                row = unaccounted_df.sample(1).iloc[0]
+                series = unaccounted_df.sample(1).iloc[0]
 
-        return row
+        return series
 
     @staticmethod
     def read_xlsx(file, header:int=0) -> pd.DataFrame:

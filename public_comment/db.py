@@ -3,13 +3,15 @@ from flask import current_app, Flask, g
 from flask.cli import with_appcontext
 import sqlite3
 
+from public_comment.const import *
+from public_comment.models import *
 
 class Row(sqlite3.Row):
     def __init__(self, cursor, values):
         self.cursor = cursor
         self.values = values
         self.columns = [col[0] for col in cursor.description]
-        self.val = " ".join([val for col, val in zip(self.columns, self.values) if 'val' in col]) # combines values with 'val in column name.
+        # self.val = " ".join([self._coerce_type(val, none='') for col, val in zip(self.columns, self.values) if 'val' in col]) # combines values with 'val in column name.
 
         for col, val in zip(self.columns, self.values):
             setattr(self, col, val)
@@ -30,13 +32,42 @@ class Row(sqlite3.Row):
     def items(self):
         return zip(self.columns, self.values)
 
+    def to_dict(self):
+        return {col: val for col, val in zip(self.columns, self.values)}
+
+    @staticmethod
+    def _coerce_type(val, separator=",", none=None):
+        """
+        Coerces `val` as a float or int if applicable,
+        if `val` is None, returns the value of `none`
+        else returns original value.
+
+        :param val: Value to coerce.
+        """
+
+        if val is None:
+            val = none
+        elif isinstance(val, str):
+            if len(coll := val.split(separator)) > 1:
+                val = [Model._coerce_type(elem.strip()) for elem in coll]
+
+            try:
+                if "." in str(val):
+                    val = float(val)
+                else:
+                    val = int(val)
+            except TypeError: pass
+            except ValueError: pass
+
+        return val
+
     def __getitem__(self, key:str):
         try:
             return getattr(self, key)
         except AttributeError:
             raise ValueError
 
-    def __repr__(self): return f"{self.val}"
+    # def __repr__(self): return f"{self.val}"
 
 
 class DataManager:
@@ -51,6 +82,32 @@ class DataManager:
         
         return g.db
 
+    @staticmethod
+    def coerce_type(val, separator=",", none=None):
+        """
+        Coerces `val` as a float or int if applicable,
+        if `val` is None, returns the value of `none`
+        else returns original value.
+
+        :param val: Value to coerce.
+        """
+
+        if val is None:
+            val = none
+        elif isinstance(val, str):
+            if len(coll := val.split(separator)) > 1:
+                val = [Model._coerce_type(elem.strip()) for elem in coll]
+
+            try:
+                if "." in str(val):
+                    val = float(val)
+                else:
+                    val = int(val)
+            except (TypeError, ValueError):
+                val = f"'{val}'"
+
+        return val
+
     #TODO: somehow connect joining on the same table multiples times to the select columns
     @staticmethod
     def _join(from_table:str, join:dict) -> str:
@@ -61,8 +118,13 @@ class DataManager:
         JOIN = ""
         if join:
             joins = []
-            for idx, (table, on) in enumerate(join.items()):
-                joins.append(f"LEFT JOIN {table} AS {table}{idx} ON {table}{idx}.{on} = {from_table}.{on}")
+            if isinstance(join, dict):
+                for idx, (table, on) in enumerate(join.items()):
+                    joins.append(f"LEFT JOIN {table} AS {table}{idx} ON {table}{idx}.{on} = {from_table}.{on}")
+            elif self.is_iter(join):
+                for idx, table in enumerate(join):
+                    joins.append(f"LEFT JOIN {table} AS {table}{idx} ON {table}{idx}.{table}_id = {from_table}.{table}_id")
+                raise NotImplementedError("Table names are plural; default id columns are singular.")
             
             JOIN = "\t\n".join(joins)
 
@@ -112,7 +174,8 @@ class DataManager:
             if isinstance(conditions, str):
                 WHERE += f"{val} = '{conditions}'"
         except TypeError:
-            pass
+            if isinstance(conditions, dict):
+                WHERE += " AND ".join([f"{col} = {DataManager.coerce_type(val)}" for col, val in conditions.items()])
 
         return WHERE
 
@@ -161,7 +224,14 @@ class DataManager:
         )
         db.commit()
 
-    # def __repr__(self): pass
+    def get_neighborhoods(self): return self.select(NEIGHBORHOODS, join={'npus': 'npu_id', 'zones': 'zone_id'}, datatype=Neighborhood)
+    def get_zones(self): return self.select(ZONES, join={NEIGHBORHOODS: ZONE_ID}, datatype=Zone)
+    def get_npus(self): return self.select(NPUs, join={NEIGHBORHOODS: NPU_ID}, datatype=NPU)
+    def get_districts(self): return self.select(DISTRICTS, datatype=District)
+
+    @staticmethod
+    def is_iter(obj) -> bool:
+        return hasattr(obj, '__iter__') and not isinstance(obj, str)
 
     @staticmethod
     def init_db():

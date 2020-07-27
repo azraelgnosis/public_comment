@@ -20,12 +20,15 @@ def register():
         new_user = models.User.from_dict(new_user_dict)
 
         error = None
-        if dm.select(USERS, where=new_user[USERNAME]):
+        if dm.select(USERS, where={USER_VAL: new_user.username}):
             error = "User already exists."
 
         if not error:
             dm.insert(USERS, values=new_user.to_dict())
-            return redirect(url_for('auth.login'))
+            user = dm.select(USERS, where={USER_VAL: new_user.username}, datatype=models.User)[0]
+            session.clear()
+            session[USER_ID] = user[USER_ID]
+            return redirect(url_for('vox.index'))
 
         flash(error)
 
@@ -37,7 +40,7 @@ def login():
         username = request.form[USERNAME]
         password = request.form[PASSWORD]
 
-        user = dm.select(USERS, where=username, datatype=models.User)[0]
+        user = dm.select(USERS, where={USER_VAL: username}, datatype=models.User)[0]
 
         error = None
         if not user:
@@ -47,7 +50,7 @@ def login():
 
         if not error:
             session.clear()
-            session[USER_ID] = user[ID]
+            session[USER_ID] = user[USER_ID]
             return redirect(url_for('vox.index'))
         
         flash(error)
@@ -61,13 +64,13 @@ def logout():
 
 @bp.before_app_request
 def load_logged_in_user():
-    user_id = session.get(USER_ID)
-
-    if user_id is None:
+    user_id = session.get(USER_ID, -1)
+    
+    try:
+        g.user = dm.select('users', where={USER_ID: user_id})[0]
+    except IndexError:
         g.user = None
-    else:
-        g.user = dm.select('users', where=user_id)[0]
-
+ 
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):

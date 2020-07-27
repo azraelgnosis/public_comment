@@ -7,20 +7,21 @@
         <input class="btn btn-primary" type="submit" value="Upload" />
     </form>
 
-    {% if row is defined %}
+    {% if comment %}
     <div class="container">
         <div class="row">
             <div class="col">
-                <form action="">
+                <form id='form' method='POST' action="{{ url_for('vox.acknowledge', dir=comment['dir'], track=comment['track']) }}" >
                     <label style="font-weight: bold;">Speaker Name</label>
-                    <input type="text" placeholder="Speaker name" value="{{ row['caller'] }}"/><br>
+                    <input type="text" placeholder="Speaker name" value="{{ comment['caller'] }}"/><br>
 
                     <h2>Location</h2>
 
                     <label>Council District</label>
-                    <select>
-                        {% for councillor in council_districts %}
-                            <option>District {{ loop.index }} - {{ councillor }}</option>
+                    <select name='districts' id='districts'>
+                        <option value=''>-</option>
+                        {% for district in districts %}
+                            <option value="{{ district.district_id }}">District {{ district.district_id }} - {{ district.councilor }}</option>
                         {% endfor %}
                     </select>
                     <br />
@@ -48,8 +49,9 @@
 
                     <label for="neighborhood">Neighborhood</label>
                     <select name="neighborhood" id="neighborhood">
+                        <option value="">-</option>
                         {% for neighborhood in neighborhoods %}
-                            <option>{{ neighborhood }}</option>
+                            <option value="{{ neighborhood.neighborhood_id }}">{{ neighborhood.name }}</option>
                         {% endfor %}
                     </select>
                     <input type="text" name="neighborhood" id="neighborhood" />
@@ -63,18 +65,12 @@
                     <br />
 
                     <label for="zone">Zone</label>
-                    <select>
+                    <select name='zones' id='zones'>
+                        <option value=''>-</option>
                         {% for zone in zones %}
-                            <option>{{ zone }}</option>
+                            <option value="{{ zone.zone_id }}">{{ zone.zone_val }}</option>
                         {% endfor %}
                     </select>
-                    <input type="text" id="zone" name="zone" />
-
-                    <datalist id="zone">
-                        {% for zone in zones %}
-                            <option value="{{ zone }}"></option>
-                        {% endfor %}
-                    </datalist>
 
                     <br />
 
@@ -88,8 +84,8 @@
 
                     <br />
 
-                    <input type="checkbox" id="atlanta_resident"/>
-                    <label for="atlanta_resident">City of Atlanta</label>
+                    <input type="checkbox" id="Atlanta" name="Atlanta"/>
+                    <label for="Atlanta">City of Atlanta</label>
                     <br />
 
                     <label for="other_location">Other</label>
@@ -118,13 +114,13 @@
             </div>
             <div class="col">
                 <audio controls></audio><br>
-                <div id="transcript" contentEditable=True>{{ row['edited text'] or row['full text'] }}</div> 
+                <div id="transcript" contentEditable=True>{{ comment['text'] }}</div> 
                 <button class="btn btn-info">Edit Transcript</button>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <input class="btn btn-primary" type="submit" />
+                <input class="btn btn-primary" type="submit" form="form"/>
             </div>
         </div>
     </div>
