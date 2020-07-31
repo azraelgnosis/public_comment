@@ -16,6 +16,10 @@ DISTRICT_ID = 'district_id'
 ZONE_ID = 'zone_id'
 NPU_ID = 'npu_id'
 
+# model attributes
+DIRECTORY = 'directory'
+TRACK = 'track'
+
 # HTTP
 GET = 'GET'
 POST = 'POST'

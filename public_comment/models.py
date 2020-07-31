@@ -4,9 +4,12 @@ class Model:
     __slots__ = ['id', 'val']
     synonyms = {}
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         for slot in self.__slots__:
             setattr(self, slot, None)
+
+        for key, val in kwargs.items():
+            setattr(self, key, val)
 
     def init(self, **kwargs):
         for key, val in kwargs.items():
@@ -36,6 +39,11 @@ class Model:
             if len(coll := val.split(separator)) > 1:
                 val = [Model._coerce_type(elem.strip()) for elem in coll]
 
+            if val == "True":
+                val = True
+            elif val == "False":
+                val = False
+
             try:
                 if "." in str(val):
                     val = float(val)
@@ -48,14 +56,7 @@ class Model:
 
     @classmethod
     def from_row(cls, row):
-        new_obj = cls()
-
-        for slot in cls.__slots__:
-            val = cls._coerce_type(getattr(row, slot, None))
-            if val:
-                setattr(new_obj, slot, val)
-
-        new_obj.init(**row.to_dict())
+        new_obj = cls.from_dict(row.to_dict())
 
         return new_obj
 
@@ -67,11 +68,11 @@ class Model:
         new_obj = cls()
 
         for slot in cls.__slots__:
-            val = cls._coerce_type(dct.get(slot))
+            val = cls._coerce_type(dct.get(slot, None))
             if val:
                 setattr(new_obj, slot, val)
 
-        new_obj.init()
+        new_obj.init(**dct)
 
         return new_obj
 
@@ -93,11 +94,11 @@ class User(Model):
     synonyms = {'user_val': 'username'}
 
 class Comment(Model):
-    __slots__ = ['dir', 'track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
+    __slots__ = ['directory', 'track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
 
     def __init__(self):
         super().__init__()
-        self.dir = ''
+        self.directory = ''
         self.track = 0
         self.entered_by = None
         self.caller = None
@@ -117,15 +118,17 @@ class Comment(Model):
 
         return new_comment
 
+    def __repr__(self): return f"{self.directory}-{self.track} {self.caller}"
+
 class Location(Model):
-    __slots__ = ['district', 'neighborhood', 'street', 'city', 'ZIP', 'zone', 'NPU', 'Atlanta', 'other']
+    __slots__ = ['district', 'neighborhood', 'street', 'city', 'zip', 'zone', 'npu', 'Atlanta', 'other_location']
 
 class NPU(Model):
     __slots__ = ['npu_id', 'npu_val', 'name', 'neighborhoods']
     synonyms = {'npu_val': 'name'}
 
 class Zone(Model):
-    __slots__ = ['zone_id', 'zone_val']
+    __slots__ = ['zone_id', 'zone_val', 'neighborhoods']
 
 class Neighborhood(Model):
     __slots__ = ['neighborhood_id', 'neighborhood_val', 'name', 'npu', 'zone']

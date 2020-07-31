@@ -11,7 +11,8 @@ class Row(sqlite3.Row):
         self.cursor = cursor
         self.values = values
         self.columns = [col[0] for col in cursor.description]
-        # self.val = " ".join([self._coerce_type(val, none='') for col, val in zip(self.columns, self.values) if 'val' in col]) # combines values with 'val in column name.
+        self.id = " ".join([str(val) for col, val in zip(self.columns, self.values) if 'id' in col]) # combines values with 'id' in column name.
+        self.val = " ".join([str(val) for col, val in zip(self.columns, self.values) if 'val' in col]) # combines values with 'val' in column name.
 
         for col, val in zip(self.columns, self.values):
             setattr(self, col, val)
@@ -67,7 +68,7 @@ class Row(sqlite3.Row):
         except AttributeError:
             raise ValueError
 
-    # def __repr__(self): return f"{self.val}"
+    def __repr__(self): return f"{self.id}: {self.val}"
 
 
 class DataManager:
@@ -107,6 +108,31 @@ class DataManager:
                 val = f"'{val}'"
 
         return val
+
+    # TODO
+    def run_query(self, query:str, datatype=None) -> list:
+        """
+        If a SELECT statement, runs the query and
+            if `datatype` converts the results to the datatype provided
+            else returns a list of Row objects
+        else, runs the query and commits to database.
+        """
+
+        db = self.get_db()
+        results = None
+
+        directive = query.split()[0]
+        if directive.upper() == 'SELECT':
+            results = db.execute(query).fetchall()
+
+            if datatype:
+                results = [datatype.from_row(result) for result in results]
+
+        else:
+            db.execute(query)
+            db.commit()
+
+        return results
 
     #TODO: somehow connect joining on the same table multiples times to the select columns
     @staticmethod
@@ -192,7 +218,6 @@ class DataManager:
                 WHERE=f"WHERE {self._where(where)}" if where else ""
             )
 
-        # results = self.get_db().execute(" ".join([SELECT, FROM, JOIN, WHERE])).fetchall()
         results = self.get_db().execute(SELECT).fetchall()
         if datatype:
             results = [datatype.from_row(result) for result in results]
@@ -225,9 +250,31 @@ class DataManager:
         db.commit()
 
     def get_neighborhoods(self): return self.select(NEIGHBORHOODS, join={'npus': 'npu_id', 'zones': 'zone_id'}, datatype=Neighborhood)
-    def get_zones(self): return self.select(ZONES, join={NEIGHBORHOODS: ZONE_ID}, datatype=Zone)
-    def get_npus(self): return self.select(NPUs, join={NEIGHBORHOODS: NPU_ID}, datatype=NPU)
     def get_districts(self): return self.select(DISTRICTS, datatype=District)
+    
+    def get_npus(self): 
+        query = """
+            SELECT npus.npu_id, npus.npu_val, GROUP_CONCAT(neighborhood_val, ',') AS neighborhoods 
+                FROM `npus`
+                LEFT JOIN neighborhoods ON neighborhoods.npu_id = npus.npu_id
+                GROUP BY npus.npu_id
+                ;"""
+        npus = self.run_query(query)
+        npus = [NPU(npu_id=row.npu_id, npu_val=row.npu_val, neighborhoods=row.neighborhoods.split(',')) for row in npus]
+
+        return npus
+            
+        
+    def get_zones(self): 
+        query = """
+            SELECT zones.zone_id, zones.zone_val, GROUP_CONCAT(neighborhood_val, ',') AS neighborhoods 
+                FROM `zones`
+                LEFT JOIN neighborhoods ON neighborhoods.zone_id = zones.zone_id
+                GROUP BY zones.zone_id;"""
+        zones = self.run_query(query)
+        zones = [Zone(zone_id=row.zone_id, zone_val=row.zone_val, neighborhoods=row.neighborhoods.split(',')) for row in zones]
+
+        return zones
 
     @staticmethod
     def is_iter(obj) -> bool:

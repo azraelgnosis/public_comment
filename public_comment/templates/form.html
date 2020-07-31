@@ -3,6 +3,7 @@
 {% block content %}
     <form method="POST" action="{{ url_for('vox.load_table') }}" enctype="multipart/form-data">
         <input type="file" name="spreadsheet" accept=".csv,.xlsx"/>
+        <label for="header">Header Rows</label>
         <input type="number" name="header" value="0" min="0"/>
         <input class="btn btn-primary" type="submit" value="Upload" />
     </form>
@@ -11,19 +12,29 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <form id='form' method='POST' action="{{ url_for('vox.acknowledge', dir=comment['dir'], track=comment['track']) }}" >
+                <form id='form' method='POST' action="{{ url_for('vox.acknowledge', directory=comment['directory'], track=comment['track']) }}" >
+                    <input type="text" name="directory" value="{{ comment['directory'] }}" hidden/>
+                    <input type="number" name="track" value="{{ comment['track'] }}" hidden/>
+                    <input type="text" name="entered by" value="{{ g.user['name'] }}" hidden/>
+
                     <label style="font-weight: bold;">Speaker Name</label>
                     <input type="text" placeholder="Speaker name" value="{{ comment['caller'] }}"/><br>
 
                     <h2>Location</h2>
 
                     <label>Council District</label>
-                    <select name='districts' id='districts'>
+                    <input type="text" name="district" id="districts" list="districts" />
+                    <datalist id="districts">
+                        {% for district in districts %}
+                            <option value="{{ district.district_val }} {{ district.name }}">District {{district.district_id }} - {{ district.councilor }}</option>
+                        {% endfor %}
+                    </datalist>
+                    <!-- <select name='district' id='districts'>
                         <option value=''>-</option>
                         {% for district in districts %}
-                            <option value="{{ district.district_id }}">District {{ district.district_id }} - {{ district.councilor }}</option>
+                            <option value="{{ district.district_val }} {{ district.name }}">District {{ district.district_id }} - {{ district.councilor }}</option>
                         {% endfor %}
-                    </select>
+                    </select> -->
                     <br />
 
                     <label for="street">Street</label>
@@ -32,16 +43,16 @@
                     <br />
                     
                     <label for="city">City</label>
-                    <select>
+                    <select name='city' id='cities'>
                         {% for city in cities %}
-                        <option>{{ city }}</option>
+                            <option value="{{ city }}">{{ city }}</option>
                         {% endfor %}
                     </select>
                     <input type="text" id="cities" name="cities" />
                     
                     <datalist id="cities">
                         {% for city in cities %}
-                        <option value="{{ city }}"></option>
+                            <option value="{{ city }}"></option>
                         {% endfor %}
                     </datalist>
                     
@@ -51,24 +62,24 @@
                     <select name="neighborhood" id="neighborhood">
                         <option value="">-</option>
                         {% for neighborhood in neighborhoods %}
-                            <option value="{{ neighborhood.neighborhood_id }}">{{ neighborhood.name }}</option>
+                            <option value="{{ neighborhood.name }}">{{ neighborhood.name }}</option>
                         {% endfor %}
                     </select>
                     <input type="text" name="neighborhood" id="neighborhood" />
 
                     <datalist id="neighborhoods">
                         {% for neighborhood in neighborhoods %}
-                            <option value="{{ neighborhood }}"></option>
+                            <option value="{{ neighborhood.name }}"></option>
                         {% endfor %}
                     </datalist>
 
                     <br />
 
                     <label for="zone">Zone</label>
-                    <select name='zones' id='zones'>
+                    <select name='zone' id='zones'>
                         <option value=''>-</option>
                         {% for zone in zones %}
-                            <option value="{{ zone.zone_id }}">{{ zone.zone_val }}</option>
+                            <option value="{{ zone.zone_val }}">{{ zone.zone_val }}</option>
                         {% endfor %}
                     </select>
 
@@ -84,7 +95,7 @@
 
                     <br />
 
-                    <input type="checkbox" id="Atlanta" name="Atlanta"/>
+                    <input type="checkbox" id="Atlanta" name="Atlanta" value="True"/>
                     <label for="Atlanta">City of Atlanta</label>
                     <br />
 
@@ -97,7 +108,7 @@
                     <br />
 
                     <label for="intent">Intent</label>
-                    <select>
+                    <select name="intent" id="intents" required>
                         {% for intent in intents %}
                             <option value="{{ intent }}">{{ intent }}</option>
                         {% endfor %}
@@ -130,6 +141,8 @@
 {% endblock content %}
 
 {% block scripts %}
-    <script>let keywords = {{ keywords|safe }};</script>
-    <script src="{{ url_for('static', filename='scripts/transcript.js') }}"></script>
+    <script>
+        let keywords = {{ keywords|safe }};
+    </script>
+    <script src="{{ url_for('static', filename='scripts/form.js') }}"></script>
 {% endblock scripts %}

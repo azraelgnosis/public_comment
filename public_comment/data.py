@@ -2,6 +2,9 @@ from flask import g
 import operator as op
 import pandas as pd
 
+from public_comment.const import *
+from public_comment.models import Comment
+
 class VoxPopuli:
     def __init__(self):
         self._table = None
@@ -18,15 +21,24 @@ class VoxPopuli:
 
         self._table = self.read_xlsx(sheet, header)
 
-    def get_series(self, table:pd.DataFrame=None, index:int=None) -> pd.Series:
+    def update_table(self, comment:Comment) -> None:
+        """
+        """
+
+        pass
+
+    def get_series(self, table:pd.DataFrame=None, directory:str=None, track:int=None) -> pd.Series:
         series = pd.Series()
         df = table
 
         if isinstance(table, pd.DataFrame) and table.empty:
             df = self.table
         if df is not None:
-            if index:
-                series = df.iloc[index]
+            if directory and track:
+                try:
+                    series = self._filter_df(df, filters={DIRECTORY: directory, TRACK: track}).iloc[0]
+                except IndexError:
+                    pass
             else:
                 unaccounted_df = self._filter_df(df, filters=['entered by'], func='isna')
                 if unaccounted_df.empty:
@@ -61,7 +73,9 @@ class VoxPopuli:
                 if is_iter(col):
                     col = list(col)
                     func = funcs(f"df_{func.__name__}", func)
-                df = df[vert(func(df[col], val)).any(axis='columns')]
+                if not is_iter(val):
+                    val = [val]
+                df = df[vert(func(df[col], val))]
         elif hasattr(filters, "__iter__"):
             for col in filters:
                 if is_iter(col):
