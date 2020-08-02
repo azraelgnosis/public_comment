@@ -25,6 +25,11 @@ class VoxPopuli:
         """
         """
 
+        self.table.set_index([DIRECTORY, TRACK], inplace=True)
+        comment.to_dict()
+
+        self.table.reset_index()
+
         pass
 
     def get_series(self, table:pd.DataFrame=None, directory:str=None, track:int=None) -> pd.Series:
@@ -40,7 +45,7 @@ class VoxPopuli:
                 except IndexError:
                     pass
             else:
-                unaccounted_df = self._filter_df(df, filters=['entered by'], func='isna')
+                unaccounted_df = self._filter_df(df, filters=[ENTERED_BY], func='isna')
                 if unaccounted_df.empty:
                     unaccounted_df = df
                 series = unaccounted_df.sample(1).iloc[0]
@@ -87,3 +92,13 @@ class VoxPopuli:
 
 def is_iter(obj) -> bool:
     return hasattr(obj, '__iter__') and not isinstance(obj, str)
+
+
+def flatten(dct:dict) -> dict:
+    new_dct = {}
+    for key, val in dct.items():
+        if isisntance(val, dict):
+            pass
+        new_dct[key] = val
+
+    return new_dct

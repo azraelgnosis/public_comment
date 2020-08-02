@@ -35,7 +35,8 @@ def form(directory:str=None, track:int=None):
     from flask import current_app
     import os
     sheet = os.path.join(current_app.instance_path, 'Full Council 2020-07-06.xlsx')
-    vp.table = {'sheet': sheet, 'header': 2}
+    if not vp.table is not None:
+        vp.table = {'sheet': sheet, 'header': 2}
 
     table = vp.table    
     row = vp.get_series(table, directory, track)

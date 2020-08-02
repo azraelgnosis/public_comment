@@ -18,6 +18,7 @@ NPU_ID = 'npu_id'
 
 # model attributes
 DIRECTORY = 'directory'
+ENTERED_BY = 'entered_by'
 TRACK = 'track'
 
 # HTTP

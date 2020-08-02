@@ -18,23 +18,17 @@
                     <input type="text" name="entered by" value="{{ g.user['name'] }}" hidden/>
 
                     <label style="font-weight: bold;">Speaker Name</label>
-                    <input type="text" placeholder="Speaker name" value="{{ comment['caller'] }}"/><br>
+                    <input type="text" name="caller" id="caller" placeholder="Speaker name" value="{{ comment['caller'] }}"/><br>
 
                     <h2>Location</h2>
 
                     <label>Council District</label>
-                    <input type="text" name="district" id="districts" list="districts" />
-                    <datalist id="districts">
-                        {% for district in districts %}
-                            <option value="{{ district.district_val }} {{ district.name }}">District {{district.district_id }} - {{ district.councilor }}</option>
-                        {% endfor %}
-                    </datalist>
-                    <!-- <select name='district' id='districts'>
+                    <select name='district' id='districts'>
                         <option value=''>-</option>
                         {% for district in districts %}
                             <option value="{{ district.district_val }} {{ district.name }}">District {{ district.district_id }} - {{ district.councilor }}</option>
                         {% endfor %}
-                    </select> -->
+                    </select>
                     <br />
 
                     <label for="street">Street</label>
@@ -43,13 +37,7 @@
                     <br />
                     
                     <label for="city">City</label>
-                    <select name='city' id='cities'>
-                        {% for city in cities %}
-                            <option value="{{ city }}">{{ city }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="text" id="cities" name="cities" />
-                    
+                    <input type="text" name="city" list="cities" />                    
                     <datalist id="cities">
                         {% for city in cities %}
                             <option value="{{ city }}"></option>
@@ -59,14 +47,7 @@
                     <br />
 
                     <label for="neighborhood">Neighborhood</label>
-                    <select name="neighborhood" id="neighborhood">
-                        <option value="">-</option>
-                        {% for neighborhood in neighborhoods %}
-                            <option value="{{ neighborhood.name }}">{{ neighborhood.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="text" name="neighborhood" id="neighborhood" />
-
+                    <input type="text" name="neighborhood" list="neighborhoods" />
                     <datalist id="neighborhoods">
                         {% for neighborhood in neighborhoods %}
                             <option value="{{ neighborhood.name }}"></option>

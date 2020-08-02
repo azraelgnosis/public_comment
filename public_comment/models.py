@@ -27,6 +27,16 @@ class Model:
                 setattr(self, key, self[val])
 
     @staticmethod
+    def _validate_attr(attr:str) -> str:
+        """
+        Returns a valid attribute as a string.
+        """
+
+        valid_attr = attr.replace(" ", "_")
+
+        return valid_attr
+
+    @staticmethod
     def _coerce_type(val, separator=","):
         """
         Coerces `val` as a float or int if applicable,
@@ -70,14 +80,27 @@ class Model:
         for slot in cls.__slots__:
             val = cls._coerce_type(dct.get(slot, None))
             if val:
-                setattr(new_obj, slot, val)
+                setattr(new_obj, cls._validate_attr(slot), val)
 
         new_obj.init(**dct)
 
         return new_obj
 
     def to_dict(self):
-        return {key: getattr(self, key) for key in self.__slots__}
+        return {key: self.dictify(self[key]) for key in self.__slots__}
+
+    @staticmethod
+    def dictify(obj):
+        """
+        Returns a dictionary if `obj` is a `Model` instance.
+        """
+
+        try:
+            obj = obj.to_dict()
+        except AttributeError:
+            pass
+
+        return obj
 
     def __repr__(self):
         name = type(self).__name__
@@ -117,6 +140,8 @@ class Comment(Model):
             new_comment.text = dct.get('full text')
 
         return new_comment
+
+    
 
     def __repr__(self): return f"{self.directory}-{self.track} {self.caller}"
 
