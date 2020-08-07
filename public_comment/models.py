@@ -86,8 +86,29 @@ class Model:
 
         return new_obj
 
-    def to_dict(self):
-        return {key: self.dictify(self[key]) for key in self.__slots__}
+    def to_dict(self, flat=False):
+        """
+        Returns Model instance as a dictionary.
+        If `flat`, nested dictionaries are 'hoisted' to the base level.
+        """
+
+        new_dict = {key: self.dictify(self[key]) for key in self.__slots__}
+
+        if flat:
+            new_dict = self._flatten(new_dict)
+
+        return new_dict
+
+    @staticmethod
+    def _flatten(dct:dict) -> dict:
+        new_dict = {}
+        for key, val in dct.items():
+            if isinstance(val, dict):
+                for key, val in Model._flatten(val).items():
+                    new_dict[key] = val
+            new_dict[key] = val
+
+        return new_dict
 
     @staticmethod
     def dictify(obj):
@@ -117,7 +138,7 @@ class User(Model):
     synonyms = {'user_val': 'username'}
 
 class Comment(Model):
-    __slots__ = ['directory', 'track', 'entered_by', 'caller', 'location', 'sentiment', 'text']
+    __slots__ = ['directory', 'track', 'entered_by', 'caller', 'location', 'sentiment', 'text', 'notes']
 
     def __init__(self):
         super().__init__()
@@ -140,8 +161,6 @@ class Comment(Model):
             new_comment.text = dct.get('full text')
 
         return new_comment
-
-    
 
     def __repr__(self): return f"{self.directory}-{self.track} {self.caller}"
 
@@ -168,4 +187,6 @@ class District(Model):
     __slots__ = ['district_id', 'district_val', 'councilor']
 
 class Sentiment(Model):
-    __slots__ = []
+    __slots__ = ['topic', 'intent']
+
+    def __repr__(self): return f"{self.topic}: {self.intent}"
