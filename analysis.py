@@ -88,7 +88,7 @@ class Analyzer:
     @staticmethod
     def replace_many(text:str, subs:dict) -> str:
         """
-        Replaces values in `text` with subtites in `subs`.
+        Replaces values in `text` with substitutes in `subs`.
 
         :param text: String to replace values in.
         :param subs: Dictionary containing values to replace.

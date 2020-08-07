@@ -1,21 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form method="POST" action="{{ url_for('vox.load_table') }}" enctype="multipart/form-data">
+    <!-- <form method="POST" action="{{ url_for('vox.load_table') }}" enctype="multipart/form-data">
         <input type="file" name="spreadsheet" accept=".csv,.xlsx"/>
         <label for="header">Header Rows</label>
         <input type="number" name="header" value="0" min="0"/>
         <input class="btn btn-primary" type="submit" value="Upload" />
-    </form>
+    </form> -->
 
     {% if comment %}
     <div class="container">
+        <div class="row">
+            <h1>{{ comment.directory }} {{ comment.track }}</h1>
+        </div>
         <div class="row">
             <div class="col">
                 <form id='form' method='POST' action="{{ url_for('vox.acknowledge', directory=comment['directory'], track=comment['track']) }}" >
                     <input type="text" name="directory" value="{{ comment['directory'] }}" hidden/>
                     <input type="number" name="track" value="{{ comment['track'] }}" hidden/>
-                    <input type="text" name="entered by" value="{{ g.user['name'] }}" hidden/>
+                    <input type="text" name="entered_by" value="{{ g.user['name'] }}" hidden/>
 
                     <label style="font-weight: bold;">Speaker Name</label>
                     <input type="text" name="caller" id="caller" placeholder="Speaker name" value="{{ comment['caller'] }}"/><br>
@@ -37,7 +40,7 @@
                     <br />
                     
                     <label for="city">City</label>
-                    <input type="text" name="city" list="cities" />                    
+                    <input type="text" name="city" list="cities" value="{{ comment.location.city }}" />                    
                     <datalist id="cities">
                         {% for city in cities %}
                             <option value="{{ city }}"></option>
@@ -72,7 +75,7 @@
                     <br />
 
                     <label for="zip">Zip Code</label>
-                    <input type="number" id="zip" name="zip" min="00501" max="99950" />
+                    <input type="number" id="zip" name="zip" min="00501" max="99950" value="{{ comment.location.zip }}" />
 
                     <br />
 
@@ -80,11 +83,11 @@
                     <label for="Atlanta">City of Atlanta</label>
                     <br />
 
-                    <label for="other_location">Other</label>
-                    <input type="text" id="other_location" name="other_location" />
+                    <label for="other">Other</label>
+                    <input type="text" id="other" name="other" value="{{ comment.location.other }}"/>
 
                     <label for="topic">Topic</label>
-                    <input type="text" id="topic" name="topic" />
+                    <input type="text" id="topic" name="topic" value="{{ comment.sentiment.topic }}" />
 
                     <br />
 
@@ -97,11 +100,8 @@
 
                     <br />
 
-                    <label for="overall">Overall:</label>
-                    <input id="overall" type="text"/>
-                    <br>
                     <label for="notes">Notes:</label>
-                    <input id="notes" type="text" />
+                    <input type="text" name="notes" value="{{ comment.notes }}" />
                 </form>
             </div>
             <div class="col">
