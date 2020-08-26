@@ -9,6 +9,18 @@
     </form> -->
 
     {% if comment %}
+    <link rel="stylesheet" type="text/css" href="../static/styles/bootstrap.darkly.min.css"/>
+    <style>
+        label {
+            min-width: 200px;
+        }
+        select {
+            margin-top: 2px;
+            margin-bottom: 8px;
+            min-width: 174px;
+            max-width: 174px;
+        }
+    </style>
     <div class="container">
         <div class="row">
             <h1>{{ comment.directory }} {{ comment.track }}</h1>
@@ -69,7 +81,7 @@
 
                     <br />
 
-                    <label for="npu">NPU (Neighborhood Planning Unit)</label>
+                    <label for="npu">Neighborhood Planning Unit</label>
                     <input type="text" id="npu" name="npu" />
 
                     <br />
@@ -79,6 +91,7 @@
 
                     <br />
 
+                    <label></label>
                     <input type="checkbox" id="Atlanta" name="Atlanta" value="True"/>
                     <label for="Atlanta">City of Atlanta</label>
                     <br />
@@ -100,7 +113,7 @@
 
                     <br />
 
-                    <label for="notes">Notes:</label>
+                    <label for="notes">Notes</label>
                     <input type="text" name="notes" value="{{ comment.notes }}" />
                 </form>
             </div>
