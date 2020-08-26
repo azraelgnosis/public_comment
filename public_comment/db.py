@@ -129,8 +129,8 @@ class DataManager:
         return results
 
     #TODO: somehow connect joining on the same table multiples times to the select columns
-    @staticmethod
-    def _join(from_table:str, join:dict) -> str:
+    @classmethod
+    def _join(cls, from_table:str, join:dict) -> str:
         """
         Creates a left join clause for each table-column pair in `join`.
         """
@@ -141,7 +141,7 @@ class DataManager:
             if isinstance(join, dict):
                 for idx, (table, on) in enumerate(join.items()):
                     joins.append(f"LEFT JOIN {table} AS {table}{idx} ON {table}{idx}.{on} = {from_table}.{on}")
-            elif self.is_iter(join):
+            elif cls.is_iter(join):
                 for idx, table in enumerate(join):
                     joins.append(f"LEFT JOIN {table} AS {table}{idx} ON {table}{idx}.{table}_id = {from_table}.{table}_id")
                 raise NotImplementedError("Table names are plural; default id columns are singular.")
