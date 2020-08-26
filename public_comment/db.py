@@ -23,12 +23,7 @@ class Row(sqlite3.Row):
             else, returns None.
         """
 
-        attribute = None
-        try:
-            attribute = getattr(self, attr)
-        except AttributeError: pass
-
-        return attribute
+        return getattr(self, attr, None)
 
     def items(self):
         return zip(self.columns, self.values)
@@ -36,8 +31,8 @@ class Row(sqlite3.Row):
     def to_dict(self):
         return {col: val for col, val in zip(self.columns, self.values)}
 
-    @staticmethod
-    def _coerce_type(val, separator=",", none=None):
+    @classmethod
+    def _coerce_type(cls, val, separator=",", none=None):
         """
         Coerces `val` as a float or int if applicable,
         if `val` is None, returns the value of `none`
@@ -50,7 +45,7 @@ class Row(sqlite3.Row):
             val = none
         elif isinstance(val, str):
             if len(coll := val.split(separator)) > 1:
-                val = [Model._coerce_type(elem.strip()) for elem in coll]
+                val = [cls._coerce_type(elem.strip()) for elem in coll]
 
             try:
                 if "." in str(val):
@@ -66,7 +61,7 @@ class Row(sqlite3.Row):
         try:
             return getattr(self, key)
         except AttributeError:
-            raise ValueError
+            raise KeyError
 
     def __repr__(self): return f"{self.id}: {self.val}"
 
@@ -109,7 +104,6 @@ class DataManager:
 
         return val
 
-    # TODO
     def run_query(self, query:str, datatype=None) -> list:
         """
         If a SELECT statement, runs the query and
@@ -188,8 +182,8 @@ class DataManager:
 
         return COLUMNS
 
-    @staticmethod
-    def _where(conditions, pk='id', val='val') -> str:
+    @classmethod
+    def _where(cls, conditions, pk='id', val='val') -> str:
         """
         """
 
@@ -201,7 +195,7 @@ class DataManager:
                 WHERE += f"{val} = '{conditions}'"
         except TypeError:
             if isinstance(conditions, dict):
-                WHERE += " AND ".join([f"{col} = {DataManager.coerce_type(val)}" for col, val in conditions.items()])
+                WHERE += " AND ".join([f"{col} = {cls.coerce_type(val)}" for col, val in conditions.items()])
 
         return WHERE
 
