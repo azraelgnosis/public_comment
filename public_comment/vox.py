@@ -38,7 +38,7 @@ def form(directory:str=None, track:int=None):
     if not vp.table is not None:
         vp.table = {'sheet': sheet, 'header': 2}
 
-    table = vp.table    
+    table = vp.table
     row = vp.get_series(table, directory, track)
     comment = Comment.from_dict(row.to_dict())
 
